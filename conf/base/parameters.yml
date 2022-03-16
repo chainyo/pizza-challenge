@@ -4,3 +4,4 @@ training:
   n_classes: 2
   wandb_project: "challenge"
   dir_path: "data/06_models/checkpoints"
+training_data_path: "data/04_feature/preprocessed_data.json"
