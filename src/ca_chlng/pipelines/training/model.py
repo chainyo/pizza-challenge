@@ -19,7 +19,7 @@ class RequestClassifier(pl.LightningModule):
         batch_size: int = 256, 
         learning_rate: float = 1e-3,
         n_classes: int = None,
-        dataset: Dict[list] = None
+        dataset: Dict[str, list] = None
     ) -> None:
         """
         Initialize the model with the parameters given and add new layers for our downstream task
