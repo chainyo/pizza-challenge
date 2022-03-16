@@ -1,0 +1,43 @@
+site_name: Pizza Challenge
+site_description: Classifying pizza requests
+repo_name: ChainYo/pizza-challenge
+repo_url: https://github.com/ChainYo/pizza-challenge
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: orange
+      accent: red
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: orange
+      accent: red
+  features:
+    - navigation.tracking
+
+nav:
+- PizzaChallenge: index.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      lang: en
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            docstring_style: numpy
+  - git-revision-date
