@@ -1,0 +1,6 @@
+training:
+  batch_size: 32
+  max_epochs: 10
+  n_classes: 2
+  wandb_project: "challenge"
+  dir_path: "data/06_models/checkpoints"
