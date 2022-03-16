@@ -1,6 +1,6 @@
 [tool.kedro]
-package_name = "ca_chlng"
-project_name = "CybelAngel Challenge"
+package_name = "pizza_challenge"
+project_name = "Pizza Challenge"
 project_version = "0.17.7"
 
 [tool.isort]
@@ -22,7 +22,7 @@ show_missing = true
 exclude_lines = ["pragma: no cover", "raise NotImplementedError"]
 
 [tool.poetry]
-name = "ca-chlng"
+name = "pizza-challenge"
 version = "0.1.0"
 description = ""
 authors = ["ChainYo <t.chaigneau.tc@gmail.com>"]

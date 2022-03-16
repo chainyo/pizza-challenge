@@ -14,7 +14,7 @@ from typing import  Any, Dict
 from .model import RequestClassifier
 
 
-def prepare_data(path: str) -> Dict[list]:
+def prepare_data(path: str) -> Dict[str, list]:
     """
     Prepare the data for training.
 
@@ -51,7 +51,7 @@ def prepare_data(path: str) -> Dict[list]:
 
 
 def training_loop(
-    dataset: Dict[list],
+    dataset: Dict[str, list],
     parameters: Dict[str, Any],
 ) -> Dict[str, bool]:
     """
