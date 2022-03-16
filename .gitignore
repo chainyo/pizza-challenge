@@ -160,3 +160,6 @@ venv.bak/
 
 # lock file
 poetry.lock
+
+# wandb experiments
+wandb/
