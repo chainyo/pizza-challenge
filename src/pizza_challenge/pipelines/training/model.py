@@ -9,66 +9,33 @@ from torch import nn
 from transformers import AutoModel, BertTokenizerFast
 
 
-class RequestClassifier(pl.LightningModule):
-    """
-    Simple classifier class to say if the request deserve a pizza or not
-    """
-    def __init__(
-        self, 
-        max_seq_len: int = 400, 
-        batch_size: int = 256, 
-        learning_rate: float = 1e-3,
-        n_classes: int = None,
-        dataset: Dict[str, list] = None
-    ) -> None:
+class Model(pl.Module):
+    def __init__(self, n_classes: int = None) -> None:
         """
-        Initialize the model with the parameters given and add new layers for our downstream task
+        Initialize the model and it's layers. BERT is used as the backbone of the model and the classification layers 
+        are added to the model.
 
         Parameters
         ----------
-        max_seq_len: int
-            Maximum length of the sequence used to pad the input, default 400
-        batch_size: int
-            Batch size for training, default is 256
-        learning_rate: float
-            Learning rate for the optimizer of the model, default 1e-3
         n_classes: int
-            Number of classes in the dataset, default is None
-        dataset: Dict[list]
-            Dictionary containing the training, validation and testing data, default is None
+            Number of classes in the dataset. Default: None
+
+        Raises
+        ------
+        ValueError
+            If n_classes is not specified. 
         """
         super().__init__()
-        self.max_seq_len = max_seq_len
-        self.batch_size = batch_size
-        self.learning_rate = learning_rate
         if n_classes is not None:
             self.n_classes = n_classes
         else:
             raise ValueError("n_classes must be specified.")
-        if dataset is not None:
-            self.X_train = dataset["X_train"]
-            self.X_val = dataset["X_val"]
-            self.X_test = dataset["X_test"]
-            self.y_train = dataset["y_train"]
-            self.y_val = dataset["y_val"]
-            self.y_test = dataset["y_test"]
-        else:
-            raise ValueError("dataset must be specified.")
-
-        # Training metrics
-        self.loss = nn.CrossEntropyLoss()
-        self.train_accuracy = torchmetrics.Accuracy()
-        self.val_accuracy = torchmetrics.Accuracy()
-        self.test_accuracy = torchmetrics.Accuracy()
-        # self.confusion_matrix = torchmetrics.ConfusionMatrix(num_classes=self.n_classes)
-        # self.precision = torchmetrics.Precision(num_classes=self.n_classes, average=None)
-        # self.recall = torchmetrics.Recall(num_classes=self.n_classes)
-        # self.f1_score = torchmetrics.F1Score(num_classes=self.n_classes)
 
         self.model = AutoModel.from_pretrained("bert-base-uncased", num_labels=self.n_classes)
-        self.model.eval() # Set model to evaluation mode
-        for param in self.model.parameters():
-            param.requires_grad = False # Freeze all the weights and prevent the existing layers from training
+        if self.training is True:
+            self.model.eval() # Set model to evaluation mode
+            for param in self.model.parameters():
+                param.requires_grad = False # Freeze all the weights and prevent the existing layers from training
 
         self.classification_layers = nn.Sequential(
             nn.Linear(768, 512),
@@ -78,7 +45,7 @@ class RequestClassifier(pl.LightningModule):
             nn.LogSoftmax(dim=1)
         )
 
-    
+
     def forward(self, encode_id: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the model
@@ -99,98 +66,31 @@ class RequestClassifier(pl.LightningModule):
         logits = self.classification_layers(output["last_hidden_state"])
         return logits[:, -1]
 
-    
-    def prepare_data(self) -> None:
+
+class RequestClassifier(pl.LightningModule):
+    def __init__(
+        self, 
+        n_classes: int,
+        learning_rate: float = 1e-3,
+    ) -> None:
         """
-        Load the data for the model and prepare it for training, validation and testing.
+        Instantiate the model and it's layers. 
+
+        Parameters
+        ----------
+        n_classes: int
+            Number of classes in the dataset.
+        learning_rate: float
+            Learning rate for the optimizer. Default: 1e-3
         """
-        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
-
-        # Tokenize and encode the input sequences for training, validation and testing
-        tokens_train = self.tokenizer.batch_encode_plus(
-            self.X_train, 
-            max_length=self.max_seq_len, 
-            pad_to_max_length=True, 
-            truncation=True, 
-            return_token_type_ids=False, 
-            return_tensors="pt"
-        )
-        tokens_val = self.tokenizer.batch_encode_plus(
-            self.X_val, 
-            max_length=self.max_seq_len, 
-            pad_to_max_length=True, 
-            truncation=True, 
-            return_token_type_ids=False, 
-            return_tensors="pt"
-        )
-        tokens_test = self.tokenizer.batch_encode_plus(
-            self.X_test, 
-            max_length=self.max_seq_len, 
-            pad_to_max_length=True, 
-            truncation=True, 
-            return_token_type_ids=False, 
-            return_tensors="pt"
-        )
-
-        self.train_seq = torch.tensor(tokens_train["input_ids"])
-        self.val_seq = torch.tensor(tokens_val["input_ids"])
-        self.test_seq = torch.tensor(tokens_test["input_ids"])
-
-        self.train_mask = torch.tensor(tokens_train["attention_mask"])
-        self.val_mask = torch.tensor(tokens_val["attention_mask"])
-        self.test_mask = torch.tensor(tokens_test["attention_mask"])
-
-        self.train_labels = torch.tensor(self.y_train)
-        self.val_labels = torch.tensor(self.y_val)
-        self.test_labels = torch.tensor(self.y_test)
-
-    
-    def train_dataloader(self) -> torch.utils.data.DataLoader:
-        """
-        Create a dataloader for the training set.
-
-        Returns
-        -------
-        torch.utils.data.DataLoader
-            Dataloader for the training set with the batch size specified in the constructor.
-        """
-        return torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(self.train_seq, self.train_mask, self.train_labels),
-            batch_size=self.batch_size,
-            shuffle=False
-        )
-
-
-    def val_dataloader(self) -> torch.utils.data.DataLoader:
-        """
-        Create a dataloader for the validation set.
-
-        Returns
-        -------
-        torch.utils.data.DataLoader
-            Dataloader for the validation set with the batch size specified in the constructor.
-        """
-        return torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(self.val_seq, self.val_mask, self.val_labels),
-            batch_size=self.batch_size,
-            shuffle=False
-        )
-
-    
-    def test_dataloader(self) -> torch.utils.data.DataLoader:
-        """
-        Create a dataloader for the testing set.
-
-        Returns
-        -------
-        torch.utils.data.DataLoader
-            Dataloader for the testing set with the batch size specified in the constructor.
-        """
-        return torch.utils.data.DataLoader(
-            torch.utils.data.TensorDataset(self.test_seq, self.test_mask, self.test_labels),
-            batch_size=self.batch_size,
-            shuffle=False
-        )
+        super().__init__()
+        self.model = Model(n_classes)
+        self.learning_rate = learning_rate
+        self.loss = nn.CrossEntropyLoss()
+        self.train_accuracy = torchmetrics.Accuracy()
+        self.val_accuracy = torchmetrics.Accuracy()
+        self.test_accuracy = torchmetrics.Accuracy()
+        self.save_hyperparameters()
 
     
     def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int) -> Dict:
@@ -295,3 +195,124 @@ class RequestClassifier(pl.LightningModule):
             Optimizer for the model
         """
         return torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+
+
+class ClassifierDataLoader(pl.LightningDataModule):
+    def __init_(
+        self, 
+        dataset: Dict[str, list],
+        batch_size: int = 128,
+        max_seq_len: int = 512,
+    ) -> None:
+        """
+        Instantiate the dataloader for the model. 
+
+        Parameters
+        ----------
+        dataset: Dict[str, list]
+            Dictionnary containing the dataset already split in train, validation and test.
+        batch_size: int
+            Batch size for the dataloaders. Default: 128
+        max_seq_len: int
+            Maximum sequence length of the dataset. Default: 512
+        """
+        super().__init__()
+        self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.max_seq_len = max_seq_len
+
+    def setup(self, stage: str = None) -> None:
+        """
+        Setup the data for the dataloader.
+
+        Parameters
+        ----------
+        stage: str
+            Stage of the training. Either "train" or "val" or "test".
+            If None, the data is loaded for all three stages. Default: None
+        """
+        if stage == "train" or stage is None:
+            tokens_train = self.tokenizer.batch_encode_plus(
+                self.dataset["X_train"], 
+                max_length=self.max_seq_len, 
+                pad_to_max_length=True, 
+                truncation=True, 
+                return_token_type_ids=False, 
+                return_tensors="pt"
+            )
+            self.train_seq = torch.tensor(tokens_train["input_ids"])
+            self.train_mask = torch.tensor(tokens_train["attention_mask"])
+            self.train_labels = torch.tensor(self.dataset["y_train"])
+        elif stage == "val" or stage is None:
+            tokens_val = self.tokenizer.batch_encode_plus(
+                self.dataset["X_val"], 
+                max_length=self.max_seq_len, 
+                pad_to_max_length=True, 
+                truncation=True, 
+                return_token_type_ids=False, 
+                return_tensors="pt"
+            )
+            self.val_seq = torch.tensor(tokens_val["input_ids"])
+            self.val_mask = torch.tensor(tokens_val["attention_mask"])
+            self.val_labels = torch.tensor(self.dataset["y_val"])
+        elif stage == "test" or stage is None:
+            tokens_test = self.tokenizer.batch_encode_plus(
+                self.X_test, 
+                max_length=self.max_seq_len, 
+                pad_to_max_length=True, 
+                truncation=True, 
+                return_token_type_ids=False, 
+                return_tensors="pt"
+            )
+        self.test_seq = torch.tensor(tokens_test["input_ids"])
+        self.test_mask = torch.tensor(tokens_test["attention_mask"])
+        self.test_labels = torch.tensor(self.dataset["y_test"])
+
+
+    def train_dataloader(self) -> torch.utils.data.DataLoader:
+        """
+        Create a dataloader for the training set.
+
+        Returns
+        -------
+        torch.utils.data.DataLoader
+            Dataloader for the training set with the batch size specified in the constructor.
+        """
+        return torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(self.train_seq, self.train_mask, self.train_labels),
+            batch_size=self.batch_size,
+            shuffle=False
+        )
+
+
+    def val_dataloader(self) -> torch.utils.data.DataLoader:
+        """
+        Create a dataloader for the validation set.
+
+        Returns
+        -------
+        torch.utils.data.DataLoader
+            Dataloader for the validation set with the batch size specified in the constructor.
+        """
+        return torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(self.val_seq, self.val_mask, self.val_labels),
+            batch_size=self.batch_size,
+            shuffle=False
+        )
+
+    
+    def test_dataloader(self) -> torch.utils.data.DataLoader:
+        """
+        Create a dataloader for the testing set.
+
+        Returns
+        -------
+        torch.utils.data.DataLoader
+            Dataloader for the testing set with the batch size specified in the constructor.
+        """
+        return torch.utils.data.DataLoader(
+            torch.utils.data.TensorDataset(self.test_seq, self.test_mask, self.test_labels),
+            batch_size=self.batch_size,
+            shuffle=False
+        )
