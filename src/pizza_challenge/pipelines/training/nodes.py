@@ -11,7 +11,7 @@ from pytorch_lightning.loggers import WandbLogger
 from sklearn.model_selection import train_test_split
 from typing import  Any, Dict
 
-from .model import RequestClassifier
+from .model import RequestClassifier, ClassifierDataLoader
 
 
 def prepare_data(path: str) -> Dict[str, list]:
@@ -53,6 +53,7 @@ def prepare_data(path: str) -> Dict[str, list]:
 def training_loop(
     dataset: Dict[str, list],
     parameters: Dict[str, Any],
+    dir_path: str,
 ) -> Dict[str, bool]:
     """
     Training loop of the Classification model.
@@ -73,14 +74,11 @@ def training_loop(
     logger = WandbLogger(project=parameters["wandb_project"])
     gpu_value = 1 if torch.cuda.is_available() else 0 # Check if GPU is available
 
-    model = RequestClassifier(
-        batch_size=parameters["batch_size"], 
-        n_classes=parameters["n_classes"], 
-        dataset=dataset
-    )
+    model = RequestClassifier(parameters["n_classes"])
+    data_module = ClassifierDataLoader(dataset, parameters["batch_size"])
 
     checkpoint_callback = callbacks.ModelCheckpoint(
-        dirpath=parameters["dir_path"],
+        dirpath=dir_path,
         save_top_k=1,
         verbose=True,
         monitor="val_loss",
@@ -101,7 +99,15 @@ def training_loop(
         callbacks=[checkpoint_callback, early_stopping_callback],
         deterministic=False,
     )
+    trainer.fit(model, data_module)
+    trainer.test(model, data_module)
 
-    trainer.fit(model)
-    trainer.test(model)
-    return {"training_done": True}
+    return {"trained_model": trainer}
+
+
+def convert_model_to_onnx(
+    trainer: Trainer,
+) -> None:
+    """
+    """
+    preds = trainer.predict()
