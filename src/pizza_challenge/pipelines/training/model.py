@@ -93,6 +93,10 @@ class RequestClassifier(pl.LightningModule):
         self.save_hyperparameters()
 
     
+    def forward(self, *args, **kwargs) -> torch.Tensor:
+        return self.model(*args, **kwargs)
+
+    
     def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int) -> Dict:
         """
         Training step of the model.
@@ -246,7 +250,7 @@ class ClassifierDataLoader(pl.LightningDataModule):
             self.train_seq = torch.tensor(tokens_train["input_ids"])
             self.train_mask = torch.tensor(tokens_train["attention_mask"])
             self.train_labels = torch.tensor(self.dataset["y_train"])
-        elif stage == "val" or stage is None:
+        if stage == "val" or stage is None:
             tokens_val = self.tokenizer.batch_encode_plus(
                 self.dataset["X_val"], 
                 max_length=self.max_seq_len, 
@@ -258,9 +262,9 @@ class ClassifierDataLoader(pl.LightningDataModule):
             self.val_seq = torch.tensor(tokens_val["input_ids"])
             self.val_mask = torch.tensor(tokens_val["attention_mask"])
             self.val_labels = torch.tensor(self.dataset["y_val"])
-        elif stage == "test" or stage is None:
+        if stage == "test" or stage is None:
             tokens_test = self.tokenizer.batch_encode_plus(
-                self.X_test, 
+                self.dataset["X_test"], 
                 max_length=self.max_seq_len, 
                 pad_to_max_length=True, 
                 truncation=True, 
