@@ -198,7 +198,8 @@ class RequestClassifier(pl.LightningModule):
 
 
 class ClassifierDataLoader(pl.LightningDataModule):
-    def __init_(
+    """"""
+    def __init__(
         self, 
         dataset: Dict[str, list],
         batch_size: int = 128,
@@ -221,6 +222,7 @@ class ClassifierDataLoader(pl.LightningDataModule):
         self.dataset = dataset
         self.batch_size = batch_size
         self.max_seq_len = max_seq_len
+
 
     def setup(self, stage: str = None) -> None:
         """
