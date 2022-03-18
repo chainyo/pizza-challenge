@@ -56,7 +56,6 @@ def prepare_data(path: str) -> Dict[str, list]:
 def training_loop(
     dataset: Dict[str, list],
     parameters: Dict[str, Any],
-    dir_path: str,
 ) -> Dict[str, bool]:
     """
     Training loop of the Classification model.
@@ -81,7 +80,7 @@ def training_loop(
     data_module = ClassifierDataLoader(dataset, parameters["batch_size"])
 
     checkpoint_callback = callbacks.ModelCheckpoint(
-        dirpath=dir_path,
+        dirpath=parameters["dir_path"],
         save_top_k=1,
         verbose=True,
         monitor="val_loss",
