@@ -106,7 +106,7 @@ I used `Kedro` to package the pipeline and it allows me to **run the pipeline on
 With only the command `kedro run` I could run the pipeline and train another model and export it to ONNX. The new
 model will be placed in the api folder and can be used to predict the pizza requests.
 
-## ONNX Optimization - [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114)
+## 💅 ONNX Optimization - [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114)
 
 ONNX is a format for storing and running deep learning models on any hardware and with any coding language.
 
@@ -116,7 +116,7 @@ Java (and many more).
 It's really a great way to package your model and run it on production environments. Plus, it allows **faster inference
 times on CPUs**.
 
-## Serving API - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api)
+## 🧃 Serving API - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api)
 
 This is the API that I have created to serve the model. It's a simple `FastAPI` server that has a `POST` endpoint
 that accepts a JSON payload with a `sample` field and returns a `JSON` response with a `prediction` field.
@@ -127,7 +127,7 @@ The API is dockerized and could be **deployed on any cloud service**. I have add
 `readyz` to check if the server is running and ready to serve requests. These endpoints are used by **Kubernetes** for 
 automated deployments.
 
-## Interface - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface)
+## 🖥️ Interface - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface)
 
 I have build a simple interface to interact with the API. There is a text input field and a button that when clicked
 will send the text to the API and display the prediction.
@@ -149,12 +149,13 @@ Dashboard: [`http://127.0.0.1:8501`](http://127.0.0.1:8501)
 
 ---
 
-## To be continued...
+## 🖋️ To be continued...
 
 - Add another model like `XGBoost` or `LightGBM` to use others metadata features from the dataset
 - Try `DistilBERT` or `Roberta` as a model backbone.
 - Add more metrics to evaluate the model
 - Improve model serving with logging
 - Deploy model on cloud (+ load balancer)
-- Add input verification layer (something like [great_expectations](https://greatexpectations.io/))
+- Add input verification layer to avoid data drift (something like [great_expectations](https://greatexpectations.io/))
 - Add ETL tool to automate re-training of the model via API calls or scheduled training jobs
+- Add a dashboard to visualize the model performance
