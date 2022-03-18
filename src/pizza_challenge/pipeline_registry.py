@@ -3,7 +3,7 @@ from typing import Dict
 
 from kedro.pipeline import Pipeline, pipeline
 
-from ca_chlng.pipelines import training
+from pizza_challenge.pipelines import training
 
 
 def register_pipelines() -> Dict[str, Pipeline]:
