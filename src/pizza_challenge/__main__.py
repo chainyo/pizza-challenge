@@ -1,5 +1,5 @@
-"""CybelAngel Challenge file for ensuring the package is executable
-as `ca-chlng` and `python -m ca_chlng`
+"""Pizza Challenge file for ensuring the package is executable
+as `pizza-challenge` and `python -m pizza-challenge`
 """
 import importlib
 from pathlib import Path
