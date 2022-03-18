@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple, Union
 
 import pytorch_lightning as pl
 
@@ -205,7 +205,7 @@ class ClassifierDataLoader(pl.LightningDataModule):
     """"""
     def __init__(
         self, 
-        dataset: Dict[str, list],
+        dataset: Dict[str, list] = None,
         batch_size: int = 128,
         max_seq_len: int = 512,
     ) -> None:
@@ -239,41 +239,55 @@ class ClassifierDataLoader(pl.LightningDataModule):
             If None, the data is loaded for all three stages. Default: None
         """
         if stage == "train" or stage is None:
-            tokens_train = self.tokenizer.batch_encode_plus(
-                self.dataset["X_train"], 
-                max_length=self.max_seq_len, 
-                pad_to_max_length=True, 
-                truncation=True, 
-                return_token_type_ids=False, 
-                return_tensors="pt"
-            )
+            tokens_train = self.tokenize_data(self.dataset["X_train"])
             self.train_seq = torch.tensor(tokens_train["input_ids"])
             self.train_mask = torch.tensor(tokens_train["attention_mask"])
             self.train_labels = torch.tensor(self.dataset["y_train"])
         if stage == "val" or stage is None:
-            tokens_val = self.tokenizer.batch_encode_plus(
-                self.dataset["X_val"], 
-                max_length=self.max_seq_len, 
-                pad_to_max_length=True, 
-                truncation=True, 
-                return_token_type_ids=False, 
-                return_tensors="pt"
-            )
+            tokens_val = self.tokenize_data(self.dataset["X_val"])
             self.val_seq = torch.tensor(tokens_val["input_ids"])
             self.val_mask = torch.tensor(tokens_val["attention_mask"])
             self.val_labels = torch.tensor(self.dataset["y_val"])
         if stage == "test" or stage is None:
-            tokens_test = self.tokenizer.batch_encode_plus(
-                self.dataset["X_test"], 
+            tokens_test = self.tokenize_data(self.dataset["X_test"])
+            self.test_seq = torch.tensor(tokens_test["input_ids"])
+            self.test_mask = torch.tensor(tokens_test["attention_mask"])
+            self.test_labels = torch.tensor(self.dataset["y_test"])
+
+    
+    def tokenize_data(self, sample: Union[str, List[str]]) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Tokenize a sample or a list of samples using the tokenizer.
+
+        Parameters
+        ----------
+        sample: Union[str, List[str]]
+            Sample or list of samples to tokenize.
+        
+        Returns
+        -------
+        Tuple[torch.Tensor, torch.Tensor]
+            Tuple containing the encoded ids and mask of the sample or list of samples.
+        """
+        if isinstance(sample, list):
+            tokens = self.tokenizer.batch_encode_plus(
+                sample, 
                 max_length=self.max_seq_len, 
                 pad_to_max_length=True, 
                 truncation=True, 
                 return_token_type_ids=False, 
                 return_tensors="pt"
             )
-            self.test_seq = torch.tensor(tokens_test["input_ids"])
-            self.test_mask = torch.tensor(tokens_test["attention_mask"])
-            self.test_labels = torch.tensor(self.dataset["y_test"])
+        elif isinstance(sample, str):
+            tokens = self.tokenizer.encode_plus(
+                sample, 
+                max_length=self.max_seq_len, 
+                pad_to_max_length=True, 
+                truncation=True, 
+                return_token_type_ids=False, 
+                return_tensors="pt"
+            )
+        return tokens
 
 
     def train_dataloader(self) -> torch.utils.data.DataLoader:
