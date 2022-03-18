@@ -1,2 +1,4 @@
-fastapi==0.66.1
-uvicorn[standard]==0.13.4
+fastapi==0.75.0
+kedro==0.17
+pydantic==1.9.0
+uvicorn[standard]==0.15.0
