@@ -29,7 +29,7 @@ try a deep learning model to see which one is better and if it's worth it to use
 
 ## 🧹 Cleaning and Exploring the Data 
 
-- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/cleaning.ipynb) -
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/cleaning.ipynb)
 
 I started the exploration with a bit of data cleaning.
 
@@ -37,7 +37,7 @@ There was some missing data in the dataset and some unnecessary data.
 
 ## 🔎 More Data Exploration
 
-- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/exploration.ipynb) -
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/exploration.ipynb)
 
 Then, I started really exploring the data.
 
@@ -53,7 +53,7 @@ I also found that negative requests contain a lot of misspellings.
 
 ## ⚙️ Preprocessing 
 
-- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/preprocessing.ipynb) -
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/preprocessing.ipynb)
 
 Then I started to preprocess the data before building any model.
 
@@ -63,7 +63,7 @@ I also arranged some columns in a way that I could use them for a training if ne
 
 ## 🧭 First Model 
 
-- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/random_forest_classifier.ipynb) -
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/random_forest_classifier.ipynb)
 
 I started with the idea to build a simple `RandomForestClassifier` model on only the text data.
 
@@ -88,7 +88,7 @@ try a deep learning model, which passion me more.
 
 ## 🧠 Deep Learning Model 
 
-- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/deep_learning.ipynb) | [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/model.py) - 
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/deep_learning.ipynb) | [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/model.py)
 
 I switched to a deep learning model and started to think about the problem and which model to use.
 
@@ -116,7 +116,7 @@ model will be placed in the api folder and can be used to predict the pizza requ
 
 ## 💅 ONNX Optimization 
 
-- [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114) -
+- [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114)
 
 ONNX is a format for storing and running deep learning models on any hardware and with any coding language.
 
@@ -128,7 +128,7 @@ times on CPUs**.
 
 ## 🧃 Serving API 
 
-- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api) -
+- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api)
 
 This is the API that I have created to serve the model. It's a simple `FastAPI` server that has a `POST` endpoint
 that accepts a JSON payload with a `sample` field and returns a `JSON` response with a `prediction` field.
@@ -141,7 +141,7 @@ automated deployments.
 
 ## 🖥️ Interface 
 
-- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface) -
+- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface)
 
 I have build a simple interface to interact with the API. There is a text input field and a button that when clicked
 will send the text to the API and display the prediction.
