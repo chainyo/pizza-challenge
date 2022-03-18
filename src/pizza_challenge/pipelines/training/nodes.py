@@ -198,12 +198,12 @@ def validate_model(conversion_outputs: Dict[str, Any]) -> Dict[str, bool]:
             pytorch_output = pytorch_model(**input_sample)
         ort_session = ort.InferenceSession(onnx_model_path)
         ort_inputs = {
-            "input_ids": np.expand_dims(input_sample["input_ids"], axis=0),
-            "attention_mask": np.expand_dims(input_sample["attention_mask"], axis=0),
+            "input_ids": to_numpy(input_sample["input_ids"]),
+            "attention_mask": to_numpy(input_sample["attention_mask"]),
         }
         ort_outputs = ort_session.run(None, ort_inputs)
         np.testing.assert_allclose(
-            to_numpy(pytorch_output), ort_outputs["output"][0], rtol=1e-03, atol=1e-05
+            to_numpy(pytorch_output), ort_outputs[0], rtol=1e-03, atol=1e-05
         )
         print("🎉 ONNX model is valid. 🎉")
     except Exception as e:
