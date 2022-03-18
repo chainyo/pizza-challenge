@@ -27,13 +27,17 @@ I followed most of the plan and its order, but machine learning problems are mor
 Since the beginning of the challenge I wanted to try a classic machine learning model to solve the problem, and then
 try a deep learning model to see which one is better and if it's worth it to use for the challenge.
 
-## 🧹 Cleaning and Exploring the Data - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/cleaning.ipynb)
+## 🧹 Cleaning and Exploring the Data 
+
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/cleaning.ipynb) -
 
 I started the exploration with a bit of data cleaning.
 
 There was some missing data in the dataset and some unnecessary data.
 
-## 🔎 More Data Exploration - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/exploration.ipynb)
+## 🔎 More Data Exploration
+
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/exploration.ipynb) -
 
 Then, I started really exploring the data.
 
@@ -47,7 +51,9 @@ Here is the wordcloud of the most common words in the `requester_text` column:
 
 I also found that negative requests contain a lot of misspellings.
 
-## ⚙️ Preprocessing - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/preprocessing.ipynb)
+## ⚙️ Preprocessing 
+
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/preprocessing.ipynb) -
 
 Then I started to preprocess the data before building any model.
 
@@ -55,7 +61,9 @@ I have replaced `True` and `False` with `1` and `0` in the `requester_received_p
 
 I also arranged some columns in a way that I could use them for a training if needed.
 
-## 🧭 First Model - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/random_forest_classifier.ipynb)
+## 🧭 First Model 
+
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/random_forest_classifier.ipynb) -
 
 I started with the idea to build a simple `RandomForestClassifier` model on only the text data.
 
@@ -78,7 +86,9 @@ As you can see, the model is not *very good*. 😅
 Because, I'm not really confident in the model choice and the tools I used, I decided to give up on this approach and
 try a deep learning model, which passion me more.
 
-## 🧠 Deep Learning Model - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/deep_learning.ipynb) | [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/model.py)
+## 🧠 Deep Learning Model 
+
+- [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/deep_learning.ipynb) | [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/model.py) - 
 
 I switched to a deep learning model and started to think about the problem and which model to use.
 
@@ -104,7 +114,9 @@ I used `Kedro` to package the pipeline and it allows me to **run the pipeline on
 With only the command `kedro run` I could run the pipeline and train another model and export it to ONNX. The new
 model will be placed in the api folder and can be used to predict the pizza requests.
 
-## 💅 ONNX Optimization - [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114)
+## 💅 ONNX Optimization 
+
+- [Implementation](https://github.com/ChainYo/pizza-challenge/blob/master/src/pizza_challenge/pipelines/training/nodes.py#L114) -
 
 ONNX is a format for storing and running deep learning models on any hardware and with any coding language.
 
@@ -114,7 +126,9 @@ Java (and many more).
 It's really a great way to package your model and run it on production environments. Plus, it allows **faster inference
 times on CPUs**.
 
-## 🧃 Serving API - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api)
+## 🧃 Serving API 
+
+- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/api) -
 
 This is the API that I have created to serve the model. It's a simple `FastAPI` server that has a `POST` endpoint
 that accepts a JSON payload with a `sample` field and returns a `JSON` response with a `prediction` field.
@@ -125,7 +139,9 @@ The API is dockerized and could be **deployed on any cloud service**. I have add
 `readyz` to check if the server is running and ready to serve requests. These endpoints are used by **Kubernetes** for 
 automated deployments.
 
-## 🖥️ Interface - [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface)
+## 🖥️ Interface 
+
+- [Implementation](https://github.com/ChainYo/pizza-challenge/tree/master/interface) -
 
 I have build a simple interface to interact with the API. There is a text input field and a button that when clicked
 will send the text to the API and display the prediction.
