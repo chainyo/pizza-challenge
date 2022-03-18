@@ -106,7 +106,7 @@ def training_loop(
     trainer.test(model, data_module)
 
     return {
-        "model_path": trainer.logger.experiment.dirpath,
+        "model_path": trainer.checkpoint_callback.best_model_path,
         "data_module": data_module,
     }
 
@@ -135,9 +135,10 @@ def convert_model_to_onnx(
 
     model = RequestClassifier.load_from_checkpoint(model_path)
     input_batch = next(iter(data_module.test_dataloader()))
+
     input_sample = {
-        "input_ids": input_batch["input_ids"][0].unsqueeze(0),
-        "attention_mask": input_batch["attention_mask"][0].unsqueeze(0),
+        "input_ids": input_batch[0][0].unsqueeze(0),
+        "attention_mask": input_batch[1][0].unsqueeze(0),
     }
 
     onnx_model_path = f"{export_path}/model.onnx"
@@ -184,7 +185,7 @@ def validate_model(conversion_outputs: Dict[str, Any]) -> Dict[str, bool]:
     onnx_model_path = conversion_outputs["onnx_model_path"]
     onnx_model = onnx.load(onnx_model_path)
     try:
-        torch.onnx.checker.check_model(onnx_model)
+        onnx.checker.check_model(onnx_model)
     except onnx.checker.ValidationError as e:
             raise ValueError(f"ONNX model is not valid: {e}")
     
