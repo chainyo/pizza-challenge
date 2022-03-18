@@ -9,7 +9,7 @@ from torch import nn
 from transformers import AutoModel, BertTokenizerFast
 
 
-class Model(pl.Module):
+class Model(nn.Module):
     def __init__(self, n_classes: int = None) -> None:
         """
         Initialize the model and it's layers. BERT is used as the backbone of the model and the classification layers 
