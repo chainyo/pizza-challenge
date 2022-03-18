@@ -1,5 +1,5 @@
 """Project settings."""
-from ca_chlng.hooks import ProjectHooks
+from pizza_challenge.hooks import ProjectHooks
 
 # Instantiate and list your project hooks here
 HOOKS = (ProjectHooks(),)
