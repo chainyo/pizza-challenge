@@ -86,7 +86,7 @@ class RequestClassifier(pl.LightningModule):
         super().__init__()
         self.model = Model(n_classes)
         self.learning_rate = learning_rate
-        self.loss = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(weight=torch.tensor([0.68, 2.0])) # Because the dataset is imbalanced
         self.train_accuracy = torchmetrics.Accuracy()
         self.val_accuracy = torchmetrics.Accuracy()
         self.test_accuracy = torchmetrics.Accuracy()
@@ -117,7 +117,7 @@ class RequestClassifier(pl.LightningModule):
         outputs = self(encode_id, mask)
         preds = torch.argmax(outputs, dim=1)
         self.train_accuracy(preds, labels)
-        loss = self.loss(outputs, labels)
+        loss = self.criterion(outputs, labels)
         self.log("train_accuracy", self.train_accuracy, prog_bar=True, on_step=False, on_epoch=True)
         self.log("train_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
         return {"loss": loss, "train_accuracy": self.train_accuracy}
@@ -143,7 +143,7 @@ class RequestClassifier(pl.LightningModule):
         outputs = self(encode_id, mask)
         preds = torch.argmax(outputs, dim=1)
         self.val_accuracy(preds, labels)
-        loss = self.loss(outputs, labels)
+        loss = self.criterion(outputs, labels)
         self.log("val_accuracy", self.val_accuracy, prog_bar=True, on_step=False, on_epoch=True)
         self.log("val_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
         return {"val_loss": loss, "val_accuracy": self.val_accuracy}
@@ -169,7 +169,7 @@ class RequestClassifier(pl.LightningModule):
         outputs = self(encode_id, mask)
         preds = torch.argmax(outputs, dim=1)
         self.test_accuracy(preds, labels)
-        loss = self.loss(outputs, labels)
+        loss = self.criterion(outputs, labels)
         self.log("test_accuracy", self.test_accuracy, prog_bar=True, on_step=True, on_epoch=True)
         self.log("test_loss", loss, prog_bar=True, on_step=True, on_epoch=True)
         return {"test_loss": loss, "test_accuracy": self.test_accuracy}  
