@@ -265,9 +265,9 @@ class ClassifierDataLoader(pl.LightningDataModule):
                 return_token_type_ids=False, 
                 return_tensors="pt"
             )
-        self.test_seq = torch.tensor(tokens_test["input_ids"])
-        self.test_mask = torch.tensor(tokens_test["attention_mask"])
-        self.test_labels = torch.tensor(self.dataset["y_test"])
+            self.test_seq = torch.tensor(tokens_test["input_ids"])
+            self.test_mask = torch.tensor(tokens_test["attention_mask"])
+            self.test_labels = torch.tensor(self.dataset["y_test"])
 
 
     def train_dataloader(self) -> torch.utils.data.DataLoader:
