@@ -23,7 +23,7 @@ theme:
     - navigation.tracking
 
 nav:
-- PizzaChallenge: index.md
+- 🍕 Pizza Challenge: index.md
 
 markdown_extensions:
   - admonition

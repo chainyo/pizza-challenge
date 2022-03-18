@@ -1,5 +1,3 @@
-# 🍕 Pizza Challenge
-
 This is the documentation for the challenge, how it works and what I did during this week.
 
 <center>
