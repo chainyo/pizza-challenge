@@ -78,6 +78,7 @@ def training_loop(
 
     model = RequestClassifier(parameters["n_classes"])
     data_module = ClassifierDataLoader(dataset, parameters["batch_size"])
+    data_module.setup()
 
     checkpoint_callback = callbacks.ModelCheckpoint(
         dirpath=parameters["dir_path"],
