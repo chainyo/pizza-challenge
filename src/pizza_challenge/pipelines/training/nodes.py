@@ -1,5 +1,8 @@
 import json
 import pandas as pd
+import numpy as np
+import onnx
+import onnxruntime as ort
 import torch
 
 from pytorch_lightning import (
@@ -102,12 +105,122 @@ def training_loop(
     trainer.fit(model, data_module)
     trainer.test(model, data_module)
 
-    return {"trained_model": trainer}
+    return {
+        "model_path": trainer.logger.experiment.dirpath,
+        "data_module": data_module,
+    }
 
 
 def convert_model_to_onnx(
-    trainer: Trainer,
-) -> None:
+    training_outputs: Dict[str, Any],
+    export_path: str,
+) -> Dict[str, Any]:
     """
+    Convert the trained model to ONNX format.
+
+    Parameters
+    ----------
+    training_outputs: Dict[str, Any]
+        Dictionary containing the trained model path and data module.
+    export_path: str
+        Path to the directory where the model will be exported.
+    
+    Returns
+    -------
+    Dict[str, Any]
+        Return onnx model path and input sample for validation.
     """
-    preds = trainer.predict()
+    model_path = training_outputs["model_path"]
+    data_module = training_outputs["data_module"]
+
+    model = RequestClassifier.load_from_checkpoint(model_path)
+    input_batch = next(iter(data_module.test_dataloader()))
+    input_sample = {
+        "input_ids": input_batch["input_ids"][0].unsqueeze(0),
+        "attention_mask": input_batch["attention_mask"][0].unsqueeze(0),
+    }
+
+    onnx_model_path = f"{export_path}/model.onnx"
+    torch.onnx.export(
+        model,
+        (input_sample["input_ids"], input_sample["attention_mask"]),
+        onnx_model_path,
+        export_params=True,
+        opset_version=11,
+        input_names=["input_ids", "attention_mask"],
+        output_names=["output"],
+        dynamic_axes={
+            "input_ids": {0: "batch_size"},
+            "attention_mask": {0: "batch_size"},
+            "output": {0: "batch_size"},
+        }
+    )
+    return {
+        "pytorch_model_path": model_path,
+        "onnx_model_path": onnx_model_path,
+        "input_sample": input_sample,
+    }
+
+
+def validate_model(conversion_outputs: Dict[str, Any]) -> Dict[str, bool]:
+    """
+    Compare the same computed output of the PyTorch model with the one exported in ONNX format.
+    
+    Parameters
+    ----------
+    conversion_outputs: Dict[str, Any]
+        Dictionary containing the trained model path, exported model path and input sample.
+
+    Raises
+    ------
+    ValueError
+        If the computed output of the PyTorch model is different from the exported ONNX model.
+
+    Returns
+    -------
+    Dict[str, bool]
+        Return True if the output of the exported model is the same as the output of the PyTorch model.
+    """
+    onnx_model_path = conversion_outputs["onnx_model_path"]
+    onnx_model = onnx.load(onnx_model_path)
+    try:
+        torch.onnx.checker.check_model(onnx_model)
+    except onnx.checker.ValidationError as e:
+            raise ValueError(f"ONNX model is not valid: {e}")
+    
+    try:
+        input_sample = conversion_outputs["input_sample"]
+        pytorch_model_path = conversion_outputs["pytorch_model_path"]
+        pytorch_model = RequestClassifier.load_from_checkpoint(pytorch_model_path)
+        pytorch_model.eval()
+        with torch.no_grad():
+            pytorch_output = pytorch_model(**input_sample)
+        ort_session = ort.InferenceSession(onnx_model_path)
+        ort_inputs = {
+            "input_ids": np.expand_dims(input_sample["input_ids"], axis=0),
+            "attention_mask": np.expand_dims(input_sample["attention_mask"], axis=0),
+        }
+        ort_outputs = ort_session.run(None, ort_inputs)
+        np.testing.assert_allclose(
+            to_numpy(pytorch_output), ort_outputs["output"][0], rtol=1e-03, atol=1e-05
+        )
+        print("🎉 ONNX model is valid. 🎉")
+    except Exception as e:
+        raise ValueError(f"ONNX model is not valid: {e}")
+    return {"validation_success": True}
+
+
+def to_numpy(tensor: torch.Tensor):
+    """
+    Converts a tensor to numpy array.
+
+    Parameters
+    ----------
+    tensor: torch.Tensor
+        Tensor to be converted.
+    
+    Returns
+    -------
+    numpy.ndarray
+    """
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
