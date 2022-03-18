@@ -46,7 +46,7 @@ class Model(nn.Module):
         )
 
 
-    def forward(self, encode_id: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+    def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the model
 
@@ -62,7 +62,7 @@ class Model(nn.Module):
         torch.Tensor
             Tensor of shape (batch_size, 2) containing the logits of the model
         """
-        output = self.model(encode_id, attention_mask=mask)
+        output = self.model(input_ids, attention_mask)
         logits = self.classification_layers(output["last_hidden_state"])
         return logits[:, -1]
 
