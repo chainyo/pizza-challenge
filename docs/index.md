@@ -178,4 +178,4 @@ Dashboard: [`http://127.0.0.1:8501`](http://127.0.0.1:8501)
 - Improve dockerization by installing only required dependencies for API.
 - Add data versioning with tools like [DVC](https://dvc.org/).
 - Add model versioning with tools like [MLflow](https://www.mlflow.org/).
-- Use cleaning methods, used before training, on text send by the interface.
+- Use cleaning methods, used before training, on text sent by the interface.
