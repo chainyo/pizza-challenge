@@ -120,7 +120,7 @@ class RequestClassifier(pl.LightningModule):
         loss = self.criterion(outputs, labels)
         self.log("train_accuracy", self.train_accuracy, prog_bar=True, on_step=False, on_epoch=True)
         self.log("train_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
-        return {"loss": loss, "train_accuracy": self.train_accuracy}
+        return {"loss": loss}
 
 
     def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int) -> Dict:
@@ -146,7 +146,7 @@ class RequestClassifier(pl.LightningModule):
         loss = self.criterion(outputs, labels)
         self.log("val_accuracy", self.val_accuracy, prog_bar=True, on_step=False, on_epoch=True)
         self.log("val_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
-        return {"val_loss": loss, "val_accuracy": self.val_accuracy}
+        return {"val_loss": loss}
 
     
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor, torch.Tensor], batch_idx: int) -> Dict:
@@ -302,7 +302,7 @@ class ClassifierDataLoader(pl.LightningDataModule):
         return torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(self.train_seq, self.train_mask, self.train_labels),
             batch_size=self.batch_size,
-            shuffle=False
+            shuffle=True,
         )
 
 
@@ -318,7 +318,7 @@ class ClassifierDataLoader(pl.LightningDataModule):
         return torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(self.val_seq, self.val_mask, self.val_labels),
             batch_size=self.batch_size,
-            shuffle=False
+            shuffle=True,
         )
 
     
@@ -334,5 +334,5 @@ class ClassifierDataLoader(pl.LightningDataModule):
         return torch.utils.data.DataLoader(
             torch.utils.data.TensorDataset(self.test_seq, self.test_mask, self.test_labels),
             batch_size=self.batch_size,
-            shuffle=False
+            shuffle=True,
         )
