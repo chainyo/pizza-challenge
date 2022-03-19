@@ -166,11 +166,16 @@ Dashboard: [`http://127.0.0.1:8501`](http://127.0.0.1:8501)
 
 ## 🖋️ To be continued...
 
-- Add another model like `XGBoost` or `LightGBM` to use others metadata features from the dataset
+- Add another model like `XGBoost` or `LightGBM` to use others metadata features from the dataset.
+- Augment the dataset with more data.
 - Try `DistilBERT` or `Roberta` as a model backbone.
-- Add more metrics to evaluate the model
-- Improve model serving with logging
-- Deploy model on cloud (+ load balancer)
-- Add input verification layer to avoid data drift (something like [great_expectations](https://greatexpectations.io/))
-- Add ETL tool to automate re-training of the model via API calls or scheduled training jobs
-- Add a dashboard to visualize the model performance
+- Add more metrics to evaluate the model.
+- Improve model serving with logging.
+- Deploy model on cloud (+ load balancer).
+- Add input verification layer to avoid data drift (something like [great_expectations](https://greatexpectations.io/)).
+- Add ETL tool to automate re-training of the model via API calls or scheduled training jobs.
+- Add a dashboard to visualize the model performance.
+- Improve dockerization by installing only required dependencies for API.
+- Add data versioning with tools like [DVC](https://dvc.org/).
+- Add model versioning with tools like [MLflow](https://www.mlflow.org/).
+- Use cleaning methods, used before training, on text send by the interface.
