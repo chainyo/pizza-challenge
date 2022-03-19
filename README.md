@@ -1,6 +1,6 @@
 # Pizza Challenge
 
-All is explained in the associated [documentation]().
+All is explained in the associated [documentation](https://chainyo.github.io/pizza-challenge/).
 
 ## Creata your training environment
 
