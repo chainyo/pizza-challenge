@@ -22,7 +22,7 @@ This is the plan I have set out for the challenge:
 
 ![challenge plan](./img/planning.jpeg)
 
-I followed most of the plan and its order, but machine learning problems are more and iterative process than a linear one.
+I followed most of the plan and its order, but machine learning problems are more an iterative process than a linear one.
 
 Since the beginning of the challenge I wanted to try a classic machine learning model to solve the problem, and then
 try a deep learning model to see which one is better and if it's worth it to use for the challenge.
@@ -65,7 +65,7 @@ I also arranged some columns in a way that I could use them for a training if ne
 
 - [Notebook](https://github.com/ChainYo/pizza-challenge/blob/master/notebooks/random_forest_classifier.ipynb)
 
-I started with the idea to build a simple `RandomForestClassifier` model on only the text data.
+I started with the idea to build a simple `RandomForestClassifier` model with only the text data.
 
 I used an old notebook I had written months ago where I used `nltk` and `gensim.word2vec` to build a word2vec model.
 
@@ -83,7 +83,7 @@ to help me find the best model.
 
 As you can see, the model is not *very good*. 😅
 
-Because, I'm not really confident in the model choice and the tools I used, I decided to give up on this approach and
+Because, I was not really confident in the model choice and the tools I used, I decided to give up on this approach and
 try a deep learning model, which passion me more.
 
 ## 🧠 Deep Learning Model 
@@ -109,7 +109,7 @@ Let's take a look at the training pipeline:
 
 ![training pipeline](./img/training-pipeline.png)
 
-I used `Kedro` to package the pipeline and it allows me to **run the pipeline on a local machine or on a cloud**.
+I used `Kedro` to package the pipeline and it allows me to **run the pipeline on a local machine or on a cloud service**.
 
 With only the command `kedro run` I could run the pipeline and train another model and export it to ONNX. The new
 model will be placed in the api folder and can be used to predict the pizza requests.
