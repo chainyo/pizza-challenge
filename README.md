@@ -2,7 +2,7 @@
 
 All is explained in the associated [documentation](https://chainyo.github.io/pizza-challenge/).
 
-## Creata your training environment
+## Create your training environment
 
 Clone the project locally and create a new `conda` environment.
 
